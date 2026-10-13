@@ -1,67 +1,148 @@
-# Template de démonstration
+# Bbox
 
-Ceci est la documentation utilisateur de l'intégration. Gladys ré-héberge ce
-fichier et affiche un lien **Documentation** permanent vers lui dans l'écran
-de configuration (dans la langue de l'utilisateur, avec l'anglais en repli) —
-c'est au moment de configurer que l'utilisateur en a le plus besoin. Gardez
-les courtes indications d'accueil dans les blocs `section` du `config_schema`
-du manifest ; mettez ici le pas-à-pas détaillé (captures d'écran, dépannage…).
+Suivez votre Bbox de Bouygues Telecom dans Gladys : état de la ligne et
+d'Internet, débits, Wi-Fi, appareils connectés et appels manqués. Tout passe
+par l'API locale de la box, sans cloud.
+
+> **Développée sans le matériel : retours bienvenus.** Cette intégration a été
+> écrite à partir de la documentation de l'API Bbox et des bibliothèques libres
+> qui l'utilisent, sans Bbox pour la tester. Si une valeur manque ou paraît
+> fausse sur votre modèle, ouvrez une issue sur
+> [GitHub](https://github.com/guim31/gladys-bbox/issues) avec le modèle de
+> votre Bbox et les logs de l'intégration.
+
+Intégration indépendante, non affiliée à Bouygues Telecom.
 
 ## Ce que vous obtenez
 
-Six appareils de démonstration apparaissent après l'installation : une
-station météo (vraies données Open-Meteo), un interrupteur, une lampe
-variable, une prise connectée avec mesure de puissance, un détecteur de
-mouvement et une caméra.
+Un appareil **Bbox**, avec :
+
+- **Connexion Internet** (connectée ou non) et **Ligne synchronisée** ;
+- **Type de ligne** (FTTH, VDSL2, ADSL) et **débits synchronisés** montant et
+  descendant (débits de synchronisation en xDSL, débit maximal annoncé par la
+  box en fibre) ;
+- **Débit descendant** et **débit montant** instantanés, en Mbit/s ;
+- **Adresse IPv4 publique** et **adresse IPv6** ;
+- **Modèle**, **micrologiciel**, **durée de fonctionnement** (en jours) et,
+  si le modèle la donne, **température** ;
+- **Wi-Fi 2,4 GHz**, **Wi-Fi 5 GHz** et, si le modèle l'a, **Wi-Fi invité** :
+  des interrupteurs, pour les couper ou les rallumer depuis Gladys ;
+- **Appels manqués** de la ligne fixe, si la box a la téléphonie ;
+- **Appareils connectés** : leur nombre.
+
+Et, si vous le souhaitez, un appareil de **présence** par appareil connu de la
+Bbox (téléphone, ordinateur…), repéré par son adresse MAC.
+
+## Prérequis
+
+- Gladys 5.1 ou plus récent.
+- Gladys sur le réseau local de la Bbox.
+- Le **mot de passe administrateur** de la Bbox : celui de l'interface web
+  [mabbox.bytel.fr](https://mabbox.bytel.fr).
+
+Modèles : l'intégration utilise l'API locale commune aux Bbox de Bouygues
+Telecom (`/api/v1`). Les réponses sur lesquelles elle a été testée viennent de
+la Bbox Fibre (F@st5330b) et de la génération Wi-Fi 6 (F@st5688b). Les Bbox
+Miami, Ultym, Must, Wi-Fi 6 et Wi-Fi 7 exposent la même API, mais aucune n'a
+été essayée en vrai : vos retours diront ce qui marche.
 
 ## Configuration
 
 1. Ouvrez l'onglet **Configuration** de l'intégration.
-2. Renseignez la **latitude** et la **longitude** que la station météo de
-   démonstration doit observer (Paris par défaut), et choisissez votre unité
-   de température. L'**intervalle de rafraîchissement** règle la fréquence
-   de lecture de la station météo et de la puissance de la prise : toutes
-   les 5 minutes par défaut, toutes les minutes au plus.
-3. Enregistrez : les appareils apparaissent dans l'onglet **Découverte**,
-   prêts à être ajoutés.
+2. **Adresse de la Bbox** : `192.168.1.254` convient à presque toutes les box.
+   Si vous avez changé le réseau de votre box, mettez sa nouvelle adresse IP.
+3. **Mot de passe administrateur** : celui de l'interface web de la box.
+   Attention, plusieurs mots de passe faux bloquent la connexion à la box
+   pendant un moment : l'intégration n'essaie plus après un refus, tant que
+   vous n'avez pas enregistré un nouveau mot de passe.
+4. **Intervalle de relevé** : toutes les 60 secondes par défaut, pas plus
+   souvent.
+5. **Langue des noms de fonctionnalités** : Gladys garde le nom d'une
+   fonctionnalité une fois l'appareil ajouté. Choisissez la langue avant
+   d'ajouter la Bbox.
+6. Enregistrez, puis cliquez sur **Tester la connexion** : le modèle, le
+   micrologiciel et l'état d'Internet s'affichent sous le bouton.
+7. Ajoutez la Bbox depuis l'onglet **Découverte**.
 
-Le réglage **Préférer la connexion locale** pilote la prise de
-démonstration : elle affiche en badge le canal réellement utilisé (local ou
-cloud), avec un point orange quand elle fonctionne en mode dégradé (local
-refusé, bascule cloud).
+## Présence des appareils connectés
+
+Avec l'option **Proposer les appareils connectés**, chaque appareil connu de la
+Bbox apparaît dans l'onglet **Découverte**. Ajoutez ceux dont vous voulez
+suivre la présence, vos téléphones par exemple.
+
+Comme la présence Bluetooth de Gladys, c'est un capteur « vu à » : la Bbox le
+signale tant que l'appareil est connecté, toutes les 5 minutes, et dès qu'il
+revient. Dans une scène, l'action **Vérifier la présence d'un utilisateur**
+considère l'utilisateur parti quand aucun de ses appareils n'a été vu depuis le
+délai choisi : prenez 10 minutes ou plus.
+
+Les téléphones récents changent d'adresse MAC d'un réseau Wi-Fi à l'autre
+(adresse « privée » ou « aléatoire ») ; sur le Wi-Fi de la maison, elle reste
+en général la même. Si un téléphone apparaît sous plusieurs noms, désactivez
+l'adresse privée pour le réseau de la Bbox dans ses réglages Wi-Fi.
 
 ## Actions
 
-- **Tester le fournisseur météo** — effectue une requête en direct vers
-  Open-Meteo et affiche la température et l'humidité actuelles sous le
-  bouton.
-- **Identifier un appareil** — choisissez un de vos appareils dans la liste
-  et il se signale (la lampe de démonstration « clignote » dans les logs).
+- **Tester la connexion** : lit la Bbox et affiche son modèle, son
+  micrologiciel et l'état d'Internet.
+- **Redémarrer la Bbox** : cochez « Je confirme le redémarrage » avant de
+  cliquer. Internet, le Wi-Fi et le téléphone sont coupés environ deux minutes,
+  Gladys compris s'il passe par le Wi-Fi.
 
 ## Scènes
 
-L'intégration ajoute ses propres cartes à l'éditeur de scènes (Gladys 5.1
-ou plus récent), dans la catégorie **Intégrations** :
+Dans l'éditeur de scènes (catégorie **Intégrations**) :
 
-- **Mouvement détecté** (déclencheur) — lance la scène quand un détecteur
-  de démonstration voit bouger quelque chose. Choisissez éventuellement le
-  détecteur et ce qui a bougé (personne, animal) ; laissés vides, toute
-  détection correspond. Les actions suivantes peuvent lire ce qui a bougé
-  avec `{{triggerEvent.data.target}}`.
-- **Identifier un appareil** (action) — fait se signaler l'appareil choisi.
-  Elle indique si l'appareil a pu se signaler, pour que les actions
-  suivantes puissent en dépendre.
+- **Connexion Internet perdue** : la Bbox a perdu sa connexion Internet.
+- **Connexion Internet rétablie** : elle est revenue. Les actions suivantes
+  lisent la durée de la coupure en minutes
+  (`{{triggerEvent.data.downtime_minutes}}`) et l'adresse IPv4
+  (`{{triggerEvent.data.ipv4}}`).
+- **Appel manqué** : un appel sur la ligne fixe est resté sans réponse. Le
+  numéro de l'appelant est dans `{{triggerEvent.data.number}}` quand le journal
+  d'appels de la box le donne.
+
+Ces déclencheurs comparent deux relevés : une coupure plus courte que
+l'intervalle de relevé peut passer inaperçue. Une Bbox qui ne répond plus du
+tout (redémarrage, câble débranché) ne déclenche rien : Gladys ne peut pas
+savoir si Internet fonctionne.
+
+Pendant une coupure, Gladys n'a plus Internet non plus : une notification qui
+passe par Internet (Telegram…) ne peut pas partir. Préférez une action locale
+(lumière, sirène), ou notifiez au rétablissement.
 
 ## Tableau de bord
 
-Ajoutez le widget **État de la démo** à un tableau de bord : il affiche en
-direct la température de la station météo et la puissance de la prise du
-bureau, la connexion utilisée par la prise (en orange si dégradée) et la
-position observée. Son bouton **Identifier la lampe** fait se signaler la
-lampe de démonstration.
+Le widget **Bbox** affiche les débits et le nombre d'appareils connectés en
+direct, l'état d'Internet et de la ligne, l'adresse IPv4, le Wi-Fi et les
+appels manqués. Son bouton allume ou coupe le Wi-Fi invité.
+
+## Certificat
+
+La Bbox sert son API en HTTPS avec un certificat émis pour `mabbox.bytel.fr`.
+Ce nom n'est connu que du serveur DNS de la box : l'intégration se connecte
+donc à l'adresse IP configurée, mais vérifie le certificat pour
+`mabbox.bytel.fr`, comme le ferait votre navigateur.
+
+Si l'état de connexion signale une **erreur de certificat**, la box sert sans
+doute une chaîne de certificats incomplète, que les navigateurs complètent
+seuls mais pas l'intégration. Dans ce cas seulement, réglez **Vérification du
+certificat** sur **Ne pas vérifier**. Le trafic reste sur votre réseau local,
+mais l'intégration ne peut plus garantir qu'elle parle à votre Bbox et non à un
+autre appareil du réseau. Signalez-le aussi en issue, avec le modèle de votre
+box.
 
 ## Dépannage
 
-L'intégration journalise tout ce qu'elle fait : consultez les logs de
-l'intégration depuis l'interface Gladys (ou `docker logs` sur l'hôte) avec
-`LOG_LEVEL=debug` pour le détail complet.
+- **« La Bbox ne répond pas »** : vérifiez l'adresse (`192.168.1.254` par
+  défaut) et que Gladys est bien sur le réseau de la box, pas derrière un autre
+  routeur.
+- **« La Bbox a refusé le mot de passe »** : saisissez-le à nouveau et
+  enregistrez. L'intégration ne réessaie pas d'elle-même, pour ne pas
+  prolonger le blocage de la box.
+- **« La Bbox bloque les connexions »** : trop d'essais ratés, depuis Gladys ou
+  ailleurs. L'intégration attend 15 minutes avant de réessayer.
+- **Une valeur reste vide** : votre modèle ne la donne peut-être pas.
+  Ouvrez une issue avec le modèle de la box et les logs.
+- **Couper le Wi-Fi** depuis Gladys coupe aussi Gladys s'il est connecté par
+  ce Wi-Fi : préférez une connexion filaire.

@@ -1,0 +1,145 @@
+{
+  "$comment": "Answers of a fibre Bbox (Wi-Fi 6 generation, F@st5688b), shaped after the public fixtures of hass-bbox2 and bboxapi-router. Every identifier is fictitious: documentation IP ranges (RFC 5737, RFC 3849), locally administered MAC addresses, a made-up serial number.",
+  "device": [
+    {
+      "device": {
+        "now": "2026-10-13T10:00:00+0200",
+        "status": 1,
+        "numberofboots": 4,
+        "modelname": "F@st5688b",
+        "modelclass": "F5688b-osin",
+        "serialnumber": "TESTSERIAL0001",
+        "main": { "version": "24.0.12", "date": "2026-06-27T11:15:05Z" },
+        "running": { "version": "24.0.12", "date": "2026-06-27T11:14:25+0200" },
+        "uptime": 432000,
+        "using": { "ipv4": 1, "ipv6": 1, "ftth": 1, "adsl": 0, "vdsl": 0 }
+      }
+    }
+  ],
+  "device/cpu": [{ "device": { "cpu": { "temperature": { "main": 46407 } } } }],
+  "wan/ip": [
+    {
+      "wan": {
+        "internet": { "state": 2 },
+        "ip": {
+          "address": "203.0.113.42",
+          "state": "Up",
+          "gateway": "203.0.113.1",
+          "ip6state": "Up",
+          "ip6address": [{ "ipaddress": "2001:db8::42", "status": "Valid" }],
+          "mac": "02:00:00:00:00:01",
+          "mtu": 1500
+        },
+        "link": { "state": "Up", "type": "FTTH" }
+      }
+    }
+  ],
+  "wan/ip/stats": [
+    {
+      "wan": {
+        "ip": {
+          "stats": {
+            "rx": { "bandwidth": 12500, "maxBandwidth": 2000000, "bytes": 602044620 },
+            "tx": { "bandwidth": 3250, "maxBandwidth": 900000, "bytes": 18753561013 }
+          }
+        }
+      }
+    }
+  ],
+  "wan/ftth": [{ "wan": { "ftth": { "mode": "1000baseT-FD", "state": "Up" } } }],
+  "wireless": [
+    {
+      "wireless": {
+        "status": "Configured",
+        "radio": {
+          "24": { "enable": 1, "standard": "11ax", "state": 1, "current_channel": 6 },
+          "5": { "enable": 1, "standard": "11ax", "state": 1, "current_channel": 108 },
+          "guest": { "enable": 0 }
+        },
+        "ssid": {
+          "24": { "id": "Bbox-TEST", "enable": 1, "security": { "passphrase": "**REDACTED**" } },
+          "5": {
+            "id": "Bbox-TEST-5GHz",
+            "enable": 1,
+            "security": { "passphrase": "**REDACTED**" }
+          },
+          "guest": { "id": "Bbox-TEST-Invite", "enable": 0 }
+        }
+      }
+    }
+  ],
+  "voip": [
+    {
+      "voip": [
+        {
+          "id": 1,
+          "status": "Up",
+          "callstate": "Idle",
+          "uri": "+33100000000@example.invalid",
+          "message_count": 0,
+          "notanswered": 2
+        }
+      ]
+    }
+  ],
+  "voip/fullcalllog/1": [
+    {
+      "calllog": [
+        {
+          "id": 2,
+          "number": "0100000002",
+          "date": 1791800000,
+          "type": "in",
+          "answered": 0,
+          "duree": 0
+        },
+        {
+          "id": 1,
+          "number": "0100000001",
+          "date": 1791700000,
+          "type": "in",
+          "answered": 0,
+          "duree": 0
+        }
+      ]
+    }
+  ],
+  "hosts": [
+    {
+      "hosts": {
+        "list": [
+          {
+            "id": 1,
+            "hostname": "phone-alice",
+            "macaddress": "02:00:00:00:10:01",
+            "ipaddress": "192.0.2.10",
+            "active": 1
+          },
+          {
+            "id": 2,
+            "hostname": "laptop",
+            "macaddress": "02:00:00:00:10:02",
+            "ipaddress": "192.0.2.11",
+            "active": 0
+          },
+          {
+            "id": 3,
+            "hostname": "",
+            "macaddress": "00:00:00:00:00:00",
+            "ipaddress": "0.0.0.0",
+            "active": 0
+          }
+        ]
+      }
+    }
+  ],
+  "device/token": [
+    {
+      "device": {
+        "token": "fake-token-not-a-secret",
+        "now": "2026-10-13T08:00:00Z",
+        "expires": "2099-01-01T00:00:00Z"
+      }
+    }
+  ]
+}

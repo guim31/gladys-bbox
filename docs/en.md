@@ -1,61 +1,139 @@
-# Demo Devices Template
+# Bbox
 
-This is the user documentation of the integration. Gladys re-hosts this file
-and shows a permanent **Documentation** link to it in the Configuration screen
-(in the user's language, with English as the fallback) — it is when
-configuring that the user needs it most. Keep the short onboarding hints in
-the `section` blocks of the manifest `config_schema`; put the long
-step-by-step (screenshots, troubleshooting…) here.
+Follow your Bouygues Telecom Bbox in Gladys: line and Internet state,
+throughput, Wi-Fi, connected devices and missed calls. Everything goes through
+the local API of the box, no cloud.
+
+> **Developed without the hardware: feedback welcome.** This integration was
+> written from the documentation of the Bbox API and the open-source libraries
+> that use it, without a Bbox to test it on. If a value is missing or looks
+> wrong on your model, open an issue on
+> [GitHub](https://github.com/guim31/gladys-bbox/issues) with the model of your
+> Bbox and the integration logs.
+
+Independent integration, not affiliated with Bouygues Telecom.
 
 ## What you get
 
-Six demo devices show up after installation: a weather station (real data
-from Open-Meteo), a switch, a dimmable light, a smart plug with power
-metering, a motion sensor and a camera.
+A **Bbox** device, with:
+
+- **Internet connection** (connected or not) and **Line synchronized**;
+- **Line type** (FTTH, VDSL2, ADSL) and **synchronized rates**, download and
+  upload (the sync rates on xDSL, the maximum rate the box announces on fibre);
+- instantaneous **download rate** and **upload rate**, in Mbit/s;
+- **public IPv4 address** and **IPv6 address**;
+- **model**, **firmware**, **uptime** (in days) and, when the model gives it,
+  **temperature**;
+- **Wi-Fi 2.4 GHz**, **Wi-Fi 5 GHz** and, when the model has it, **guest
+  Wi-Fi**: switches, to turn them off or on from Gladys;
+- **missed calls** of the landline, when the box has telephony;
+- **connected devices**: how many.
+
+And, if you wish, a **presence** device for each device the Bbox knows (phone,
+computer…), identified by its MAC address.
+
+## Prerequisites
+
+- Gladys 5.1 or later.
+- Gladys on the local network of the Bbox.
+- The **administrator password** of the Bbox: the one of the web interface
+  [mabbox.bytel.fr](https://mabbox.bytel.fr).
+
+Models: the integration uses the local API shared by the Bouygues Telecom Bbox
+routers (`/api/v1`). The answers it was tested against come from the Bbox Fibre
+(F@st5330b) and the Wi-Fi 6 generation (F@st5688b). The Bbox Miami, Ultym,
+Must, Wi-Fi 6 and Wi-Fi 7 expose the same API, but none was tried for real:
+your feedback will tell what works.
 
 ## Configuration
 
 1. Open the **Configuration** tab of the integration.
-2. Set the **latitude** and **longitude** the demo weather station should
-   observe (they default to Paris), and pick your temperature unit.
-   The **refresh interval** sets how often the weather station and the
-   plug's power are read: every 5 minutes by default, every minute at most.
-3. Save: the devices appear in the **Discovery** tab, ready to be added.
+2. **Bbox address**: `192.168.1.254` fits nearly every box. If you changed the
+   network of your box, enter its new IP address.
+3. **Administrator password**: the one of the web interface of the box.
+   Several wrong passwords lock the login of the box for a while: after a
+   refusal, the integration stops trying until you save a new password.
+4. **Refresh interval**: every 60 seconds by default, never more often.
+5. **Language of the feature names**: Gladys keeps a feature name once the
+   device is added. Pick the language before adding the Bbox.
+6. Save, then click **Test the connection**: the model, the firmware and the
+   Internet state show under the button.
+7. Add the Bbox from the **Discovery** tab.
 
-The **Prefer the local connection** toggle drives the demo plug: it reports
-the channel it actually uses as a badge (local or cloud), with an orange dot
-when it runs degraded (local refused, cloud fallback).
+## Presence of the connected devices
+
+With **Offer the connected devices** on, every device the Bbox knows appears in
+the **Discovery** tab. Add the ones whose presence you want to follow, your
+phones for instance.
+
+Like the Bluetooth presence of Gladys, it is a "seen at" sensor: it is
+reported while the device is connected, every 5 minutes, and as soon as it
+comes back. In a scene, the **Check user presence** action considers the user
+gone when none of their devices was seen within the chosen delay: use 10
+minutes or more.
+
+Recent phones change their MAC address from one Wi-Fi network to another
+("private" or "random" address); on the home Wi-Fi it usually stays the same.
+If a phone shows up under several names, turn the private address off for the
+Bbox network in its Wi-Fi settings.
 
 ## Actions
 
-- **Test the weather provider** — performs a live request to Open-Meteo and
-  shows the current temperature and humidity under the button.
-- **Identify a device** — pick one of your devices in the list and it will
-  signal itself (the demo light "blinks" in the logs).
+- **Test the connection**: reads the Bbox and shows its model, firmware and
+  Internet state.
+- **Restart the Bbox**: tick "I confirm the restart" before clicking. Internet,
+  Wi-Fi and telephone are cut for about two minutes, Gladys included if it uses
+  the Wi-Fi.
 
 ## Scenes
 
-The integration adds its own cards to the scene editor (Gladys 5.1 or
-later), under the **Integrations** category:
+In the scene editor (**Integrations** category):
 
-- **Motion detected** (trigger) — starts the scene when a demo motion sensor
-  sees something move. Optionally pick the sensor and what moved (person,
-  animal); left empty, any detection matches. The following actions can
-  read what moved with `{{triggerEvent.data.target}}`.
-- **Identify a device** (action) — makes the chosen device signal itself.
-  It returns whether the device could signal itself, so the following
-  actions can depend on it.
+- **Internet connection lost**: the Bbox lost its Internet connection.
+- **Internet connection restored**: it is back. The next actions read the
+  outage duration in minutes (`{{triggerEvent.data.downtime_minutes}}`) and the
+  IPv4 address (`{{triggerEvent.data.ipv4}}`).
+- **Missed call**: a call on the landline went unanswered. The caller number is
+  in `{{triggerEvent.data.number}}` when the call log of the box gives it.
+
+These triggers compare two readings: an outage shorter than the refresh
+interval may go unnoticed. A Bbox that does not answer at all (restart,
+unplugged cable) fires nothing: Gladys cannot tell whether Internet works.
+
+During an outage Gladys has no Internet either: a notification that goes
+through Internet (Telegram…) cannot leave. Prefer a local action (light,
+siren), or notify when the connection is restored.
 
 ## Dashboard
 
-Add the **Demo status** widget to a dashboard: it shows the live
-temperature of the weather station and the power of the office plug, the
-connection the plug currently uses (orange when degraded) and the observed
-location. Its **Identify the light** button makes the demo light signal
-itself.
+The **Bbox** widget shows the throughput and the number of connected devices
+live, the Internet and line state, the IPv4 address, the Wi-Fi and the missed
+calls. Its button turns the guest Wi-Fi on or off.
+
+## Certificate
+
+The Bbox serves its API over HTTPS with a certificate issued for
+`mabbox.bytel.fr`. Only the DNS server of the box knows that name: the
+integration therefore connects to the configured IP address, but checks the
+certificate for `mabbox.bytel.fr`, as your browser would.
+
+If the connection status reports a **certificate error**, the box probably
+serves an incomplete certificate chain, which browsers complete on their own
+but the integration cannot. In that case only, set **Certificate check** to
+**Do not verify**. The traffic stays on your local network, but the integration
+can no longer guarantee it talks to your Bbox and not to another device of the
+network. Please report it in an issue too, with the model of your box.
 
 ## Troubleshooting
 
-The integration logs everything it does: check the integration logs from the
-Gladys UI (or `docker logs` on the host) with `LOG_LEVEL=debug` for the full
-detail.
+- **"The Bbox does not answer"**: check the address (`192.168.1.254` by
+  default) and that Gladys is on the network of the box, not behind another
+  router.
+- **"The Bbox refused the password"**: type it again and save. The integration
+  does not retry by itself, not to extend the lock of the box.
+- **"The Bbox blocks logins"**: too many failed attempts, from Gladys or
+  elsewhere. The integration waits 15 minutes before a new attempt.
+- **A value stays empty**: your model may not give it. Open an issue with the
+  model of the box and the logs.
+- **Turning the Wi-Fi off** from Gladys also cuts Gladys if it uses that Wi-Fi:
+  prefer a wired connection.
