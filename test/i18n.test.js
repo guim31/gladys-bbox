@@ -139,3 +139,76 @@ test('the integration name is the same in every language', () => {
   assert.equal(typeof manifest.name, 'string');
   assert.ok(manifest.name.length >= 3 && manifest.name.length <= 30);
 });
+
+// The store publishes docs/en.md and docs/fr.md, and docs/de.md and
+// docs/es.md when they exist: the four carry the same sections, in order.
+const DOC_SECTIONS = {
+  en: [
+    'What you get',
+    'Prerequisites',
+    'Configuration',
+    'Presence of the connected devices',
+    'Actions',
+    'Scenes',
+    'Dashboard',
+    'Certificate',
+    'Troubleshooting',
+  ],
+  fr: [
+    'Ce que vous obtenez',
+    'Prérequis',
+    'Configuration',
+    'Présence des appareils connectés',
+    'Actions',
+    'Scènes',
+    'Tableau de bord',
+    'Certificat',
+    'Dépannage',
+  ],
+  de: [
+    'Was du bekommst',
+    'Voraussetzungen',
+    'Konfiguration',
+    'Anwesenheit der verbundenen Geräte',
+    'Aktionen',
+    'Szenen',
+    'Dashboard',
+    'Zertifikat',
+    'Fehlerbehebung',
+  ],
+  es: [
+    'Lo que obtiene',
+    'Requisitos',
+    'Configuración',
+    'Presencia de los dispositivos conectados',
+    'Acciones',
+    'Escenas',
+    'Panel',
+    'Certificado',
+    'Solución de problemas',
+  ],
+};
+
+const docs = Object.fromEntries(
+  await Promise.all(
+    LANGUAGES.map(async (language) => [
+      language,
+      await readFile(new URL(`../docs/${language}.md`, import.meta.url), 'utf8'),
+    ]),
+  ),
+);
+
+test('the documentation exists in the four languages, with the same sections', () => {
+  assert.deepEqual(Object.keys(DOC_SECTIONS).sort(), [...LANGUAGES].sort());
+  for (const language of LANGUAGES) {
+    const doc = docs[language];
+    assert.equal(doc.split('\n')[0], '# Bbox', `docs/${language}.md: title`);
+    const sections = [...doc.matchAll(/^## (.+)$/gm)].map((match) => match[1]);
+    assert.deepEqual(sections, DOC_SECTIONS[language], `docs/${language}.md: sections`);
+  }
+});
+
+test('the documentation keeps the register: "du" in German, "usted" in Spanish', () => {
+  assert.doesNotMatch(docs.de, /\b(Sie|Ihr|Ihre|Ihren|Ihrem|Ihrer|Ihres|Ihnen)\b/);
+  assert.doesNotMatch(docs.es, /\b(tú|tu|tus|ti|contigo)\b/i);
+});

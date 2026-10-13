@@ -15,7 +15,8 @@ written from the API documentation and the open-source clients listed below,
 and tested against recorded answers only. Please open an issue with your Bbox
 model and the integration logs if something is missing or wrong.
 
-User documentation: [English](docs/en.md) · [Français](docs/fr.md).
+User documentation: [English](docs/en.md) · [Français](docs/fr.md) ·
+[Deutsch](docs/de.md) · [Español](docs/es.md).
 
 ## What it does
 

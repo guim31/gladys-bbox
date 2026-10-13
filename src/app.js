@@ -74,6 +74,11 @@ export function createApp(gladys, options = {}) {
   let timer = null;
   let running = false;
   let readingPromise = null;
+  // Calm logs: a normal reading writes nothing at info level. A failure
+  // writes one line when it starts (or changes kind) and one when it ends,
+  // not one per reading; the repeats go to debug.
+  let failure = null;
+  let announced = false;
 
   function setConfig(raw) {
     const previous = config;
@@ -89,6 +94,31 @@ export function createApp(gladys, options = {}) {
     if (config.tls_verify === 'insecure') {
       logger.warn('Certificate verification of the Bbox is turned off (tls_verify: insecure)');
     }
+  }
+
+  function reportFailure(kind, message, err) {
+    if (kind === failure) {
+      logger.debug(message);
+      return;
+    }
+    failure = kind;
+    if (err) {
+      logger.error(message, err);
+    } else {
+      logger.warn(message);
+    }
+  }
+
+  function reportSuccess() {
+    if (failure !== null) {
+      logger.info('Reading the Bbox works again');
+    } else if (!announced) {
+      logger.info(
+        `Connected to the Bbox ${snapshot.model ?? '?'} (firmware ${snapshot.firmware ?? '?'})`,
+      );
+    }
+    failure = null;
+    announced = true;
   }
 
   async function setStatus(key) {
@@ -163,12 +193,19 @@ export function createApp(gladys, options = {}) {
       lostAt = null;
     }
     for (const event of events) {
-      logger.info(`Scene event ${event.key}`);
+      // The Internet connection of the box going down or up is worth a line;
+      // the scene event itself is a detail.
+      if (event.key === TRIGGER.CONNECTION_LOST) {
+        logger.info('Internet connection of the Bbox lost');
+      } else if (event.key === TRIGGER.CONNECTION_RESTORED) {
+        logger.info('Internet connection of the Bbox restored');
+      }
+      logger.debug(`Scene event ${event.key}`);
       await gladys.publishSceneEvent(event.key, event.data);
     }
     for (const lineId of missedLines) {
       const number = await readLastMissedCaller(client, lineId);
-      logger.info('Scene event missed_call');
+      logger.debug('Scene event missed_call');
       await gladys.publishSceneEvent(TRIGGER.MISSED_CALL, {
         number,
         count: snapshot.missedCalls,
@@ -207,14 +244,17 @@ export function createApp(gladys, options = {}) {
     } catch (err) {
       reachable = false;
       // The message names the route and the status, never a credential.
-      logger.warn(`Reading the Bbox failed: ${err.message}`);
+      reportFailure(
+        err instanceof BboxError ? err.kind : 'api_error',
+        `Reading the Bbox failed: ${err.message}`,
+      );
       await setStatus(err instanceof BboxError ? err.kind : 'api_error');
       refreshWidgetIfChanged();
       return;
     }
     if (!next.serial) {
       reachable = false;
-      logger.warn('The Bbox gave neither its serial number nor its WAN MAC address');
+      reportFailure('no_serial', 'The Bbox gave neither its serial number nor its WAN MAC address');
       await setStatus('api_error');
       return;
     }
@@ -227,12 +267,13 @@ export function createApp(gladys, options = {}) {
     await publishEvents(previous);
     await setStatus('ok');
     refreshWidgetIfChanged();
+    reportSuccess();
   }
 
   /** One reading at a time: the timer, a scan and a poll can overlap. */
   function refresh() {
     readingPromise ??= read()
-      .catch((err) => logger.error('Reading cycle failed', err))
+      .catch((err) => reportFailure('cycle', 'Reading cycle failed', err))
       .finally(() => {
         readingPromise = null;
       });
@@ -280,6 +321,7 @@ export function createApp(gladys, options = {}) {
       logger.warn(`Connection test failed: ${err.message}`);
       throw userError(err);
     }
+    logger.info('Connection test succeeded');
     return format(TEXTS.action.test_ok, (language) => ({
       model: tested.model ?? '?',
       firmware: tested.firmware ?? '?',
@@ -349,6 +391,8 @@ export function createApp(gladys, options = {}) {
     gladys.onConfigUpdated(async (newConfig) => {
       setConfig(newConfig);
       statusKey = null;
+      failure = null;
+      announced = false;
       await refresh();
       // Language or host tracking may change the published devices.
       await publishDiscovery();
@@ -360,6 +404,8 @@ export function createApp(gladys, options = {}) {
         setConfig(await gladys.getConfig());
         await capabilityStore.load();
         statusKey = null;
+        failure = null;
+        announced = false;
         discoverySignature = null;
         widgetSignature = null;
         await start();
