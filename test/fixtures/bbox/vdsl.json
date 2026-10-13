@@ -1,0 +1,63 @@
+{
+  "$comment": "Answers of an older xDSL Bbox (F@st5330b generation), shaped after the public fixtures of bboxapi-router: temperature in /device, no guest Wi-Fi, no telephony. Every identifier is fictitious.",
+  "device": [
+    {
+      "device": {
+        "status": 1,
+        "modelname": "F@st5330b",
+        "serialnumber": "TESTSERIAL0002",
+        "main": { "version": "12.11.0" },
+        "temperature": { "current": 51.25 },
+        "uptime": 186893,
+        "using": { "ipv4": 1, "ipv6": 0, "ftth": 0, "adsl": 0, "vdsl": 1 }
+      }
+    }
+  ],
+  "wan/ip": [
+    {
+      "wan": {
+        "ip": {
+          "address": "198.51.100.7",
+          "state": "Up",
+          "ip6address": [],
+          "mac": "02:00:00:00:00:02"
+        },
+        "link": { "state": "Up", "type": "vdsl" }
+      }
+    }
+  ],
+  "wan/ip/stats": [
+    {
+      "wan": {
+        "ip": {
+          "stats": {
+            "rx": { "bandwidth": 800, "maxBandwidth": 52000 },
+            "tx": { "bandwidth": 120, "maxBandwidth": 8000 }
+          }
+        }
+      }
+    }
+  ],
+  "wan/xdsl": [
+    {
+      "wan": {
+        "xdsl": {
+          "state": "Connected",
+          "modulation": "VDSL2",
+          "up": { "bitrates": 8000 },
+          "down": { "bitrates": 52000 }
+        }
+      }
+    }
+  ],
+  "wireless": [
+    {
+      "wireless": {
+        "radio": { "24": { "enable": 1 }, "5": { "enable": 0 } },
+        "ssid": { "24": { "id": "Bbox-OLD" }, "5": { "id": "Bbox-OLD-5" } }
+      }
+    }
+  ],
+  "hosts": [{ "hosts": { "list": [] } }],
+  "device/token": [{ "device": { "token": "fake-token-2", "expires": "2099-01-01T00:00:00Z" } }]
+}

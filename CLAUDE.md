@@ -31,16 +31,20 @@ pushing.
 ## Architecture
 
 ```
-index.js                          SDK wiring only: handlers registered before connect()
-src/devices/index.js              registry of the device blueprints + dispatch helpers
-src/devices/<type>.js             one device type per file (buildDevice, onPoll, onSetValue...)
-src/scenes.js                     scene action handlers (manifest `scene_actions`)
-src/widgets.js                    dashboard widget handlers (manifest `widgets`)
+index.js                          SDK wiring only: createApp(gladys).register(), then connect()
+src/app.js                        reading loop, states, presence, triggers, commands, actions, widget
+src/bbox/client.js                Bbox API client: login (BBOX_ID cookie), btoken, error kinds
+src/bbox/transport.js             HTTPS to the box, certificate checked for mabbox.bytel.fr
+src/bbox/snapshot.js              one reading: API answers -> flat snapshot (pure part tested)
+src/devices.js                    published devices (Bbox + host presence) and their states
+src/triggers.js                   scene triggers (connection lost/restored, missed call)
+src/widget.js                     the `bbox` dashboard widget
+src/capabilities.js               model capabilities, remembered in /data/capabilities.json
+src/i18n.js                       user texts in en, fr, de, es
 src/config.js                     DEFAULT_CONFIG (mirrors the manifest defaults) + normalization
-src/weather.js                    example driver (Open-Meteo)
 gladys-assistant-integration.json manifest: name, config_schema, actions, image...
 docs/en.md, docs/fr.md            user documentation, re-hosted by Gladys (mandatory)
-test/                             node --test, against the SDK's fake Gladys (integration-sdk/testing)
+test/                             node --test, SDK fake Gladys + in-memory Bbox (test/helpers/)
 .github/scripts/release.mjs       release helpers (manifest bump, changelog), tested in test/
 ```
 
@@ -156,6 +160,13 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
   fonctions non publiées. Les boutons de widget qui ouvrent un formulaire (#3168, commit 3feb2cf8)
   sont absents de la 5.1.4 : le bouton s'affiche et n'envoie rien. Vérifier par `git tag --contains`.
 
+- **Aucune confirmation sur un bouton de widget** dans les cœurs publiés (5.1.4 et 5.2.0 : ni
+  `confirm` dans `WidgetComponents.jsx`, ni dans `normalizeWidgetContent`). Une action manifeste n'en
+  a pas non plus : une opération dangereuse (redémarrage) reste une action de la Configuration, avec
+  une case à cocher que le handler exige. Les `fields` d'un bouton de widget n'existent qu'à partir
+  de la 5.2.0.
+- Depuis octobre 2026, **la dernière version publiée est la 5.2.0** (`git tag --sort=-creatordate`).
+
 - Un réglage de widget ne propose en liste que les **appareils** de l'intégration
   (`source: "devices"`, seule source dynamique).
 - Budget du cœur : **8 composants par widget, dont 2 textes au plus**, appliqué **avant** la
@@ -176,6 +187,34 @@ code de ce dépôt. Compléter ce fichier quand un nouveau piège est découvert
 - Les filtres de scène ne font qu'égalité et appartenance : un seuil reste le travail d'un capteur.
 - **Les clés de widgets, de déclencheurs et d'actions sont figées une fois publiées.**
 - `gladys_version` `>=5.1.0` dès qu'il y a widgets, déclencheurs ou actions de scène.
+
+**Présence et compteurs**
+
+- **Présence par réseau : `presence-sensor/push`, publié à 1 quand l'appareil est vu**, comme le
+  Bluetooth du cœur. L'action de scène « vérifier la présence » lit `last_value_changed`, que
+  `saveState` met à jour à **chaque** état, quelle que soit la valeur : un `binary` publié à 0
+  ferait croire l'utilisateur présent. Republier le 1 par un `heartbeat` (5 min) pendant que
+  l'appareil est vu, et `forgetPublishedStates` quand il disparaît pour le signaler dès son retour.
+- `DEVICE_FEATURE_TYPES` n'a **pas de clé `COUNTER_SENSOR`** : `counter-sensor/integer` s'écrit
+  `TYPES.SENSOR.INTEGER`. Une constante `undefined` ne se voit qu'à l'exécution : la découverte lève
+  une `TypeError` avalée par la boucle de relevé.
+
+**Tests**
+
+- `node --test` sans argument exécute **tout fichier `.js` sous `test/`**, `test/helpers/` compris :
+  un helper ne doit avoir aucun effet de bord à l'import.
+
+**Bbox (API locale)**
+
+- Le certificat de `mabbox.bytel.fr` est public, mais ce nom n'est résolu que par le DNS de la box.
+  Se connecter à l'IP (`192.168.1.254`) avec `servername: 'mabbox.bytel.fr'` garde la vérification
+  TLS sans dépendre du DNS de l'hôte Gladys. Certains clients signalent une chaîne incomplète
+  (`unable to get local issuer certificate`) : désactivation seulement par un réglage explicite.
+- La Bbox **bloque la connexion après quelques mots de passe faux (429)** et chaque essai prolonge le
+  blocage : ne jamais réessayer un mot de passe refusé avant un changement de configuration.
+- La documentation officielle `api.bbox.fr/doc/apirouter` est inaccessible depuis une session de code
+  (proxy) et signalée hors ligne sur les forums ; les clients libres (pybbox, bboxapi-router, bbox-cli,
+  hass-bbox2) en tiennent lieu.
 
 ## Store
 

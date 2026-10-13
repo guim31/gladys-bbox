@@ -1,177 +1,344 @@
 {
   "manifest_version": 1,
   "type": "device",
-  "name": "Demo Devices Template",
+  "name": "Bbox",
   "description": {
-    "en": "Starter template showing sensors, a switch, a dimmable light and a smart plug.",
-    "fr": "Template de démarrage : capteurs, interrupteur, lampe variable et prise connectée."
+    "en": "Bouygues Telecom Bbox status: line, Internet, Wi-Fi, connected devices and missed calls.",
+    "fr": "État de la Bbox de Bouygues Telecom : ligne, Internet, Wi-Fi, appareils, appels manqués.",
+    "de": "Status der Bbox von Bouygues Telecom: Leitung, Internet, WLAN, Geräte, verpasste Anrufe.",
+    "es": "Estado de la Bbox de Bouygues Telecom: línea, Internet, Wi-Fi, dispositivos y llamadas."
   },
   "version": "1.0.0",
-  "docker_image": "ghcr.io/gladysassistant/integration-template-js:1.0.0",
+  "docker_image": "ghcr.io/guim31/gladys-bbox:1.0.0",
   "gladys_version": ">=5.1.0",
-  "cover_image": "https://raw.githubusercontent.com/GladysAssistant/integration-template-js/master/cover.png",
-  "categories": ["lighting", "security", "environment"],
-  "transports": ["local", "cloud"],
+  "cover_image": "https://raw.githubusercontent.com/guim31/gladys-bbox/main/cover.png",
+  "categories": ["network"],
+  "transports": ["local"],
   "config_schema": [
     {
       "key": "intro",
       "type": "section",
-      "label": { "en": "Getting started", "fr": "Pour commencer" },
-      "description": {
-        "en": "The demo weather station reads real data from the free Open-Meteo API: pick the coordinates to observe. No account, no API key.",
-        "fr": "La station météo de démonstration lit de vraies données via l'API gratuite Open-Meteo : choisissez les coordonnées à observer. Pas de compte, pas de clé d'API."
+      "label": {
+        "en": "Connect your Bbox",
+        "fr": "Connecter votre Bbox",
+        "de": "Verbinde deine Bbox",
+        "es": "Conecte su Bbox"
       },
-      "links": [
+      "description": {
+        "en": "Gladys must be on the Bbox network. The integration reads the Bbox local API with the administrator password, the one of the web interface (mabbox.bytel.fr). Not affiliated with Bouygues Telecom.",
+        "fr": "Gladys doit être sur le réseau de la Bbox. L'intégration lit l'API locale de la Bbox avec le mot de passe administrateur, celui de l'interface web (mabbox.bytel.fr). Non affiliée à Bouygues Telecom.",
+        "de": "Gladys muss im Netzwerk der Bbox sein. Die Integration liest die lokale API der Bbox mit dem Administratorpasswort, dem der Weboberfläche (mabbox.bytel.fr). Nicht mit Bouygues Telecom verbunden.",
+        "es": "Gladys debe estar en la red de la Bbox. La integración lee la API local de la Bbox con la contraseña de administrador, la de la interfaz web (mabbox.bytel.fr). Sin relación con Bouygues Telecom."
+      }
+    },
+    {
+      "key": "host",
+      "type": "string",
+      "label": {
+        "en": "Bbox address",
+        "fr": "Adresse de la Bbox",
+        "de": "Adresse der Bbox",
+        "es": "Dirección de la Bbox"
+      },
+      "description": {
+        "en": "IP address of the Bbox on your network, or mabbox.bytel.fr. The certificate is always checked for mabbox.bytel.fr.",
+        "fr": "Adresse IP de la Bbox sur votre réseau, ou mabbox.bytel.fr. Le certificat est toujours vérifié pour mabbox.bytel.fr.",
+        "de": "IP-Adresse der Bbox in deinem Netzwerk oder mabbox.bytel.fr. Das Zertifikat wird immer für mabbox.bytel.fr geprüft.",
+        "es": "Dirección IP de la Bbox en su red, o mabbox.bytel.fr. El certificado siempre se comprueba para mabbox.bytel.fr."
+      },
+      "placeholder": {
+        "en": "192.168.1.254",
+        "fr": "192.168.1.254",
+        "de": "192.168.1.254",
+        "es": "192.168.1.254"
+      },
+      "required": true,
+      "default": "192.168.1.254"
+    },
+    {
+      "key": "password",
+      "type": "secret",
+      "label": {
+        "en": "Administrator password",
+        "fr": "Mot de passe administrateur",
+        "de": "Administratorpasswort",
+        "es": "Contraseña de administrador"
+      },
+      "description": {
+        "en": "The password of the Bbox web interface. Several wrong attempts lock the login for a while.",
+        "fr": "Le mot de passe de l'interface web de la Bbox. Plusieurs erreurs bloquent la connexion un moment.",
+        "de": "Das Passwort der Weboberfläche der Bbox. Mehrere Fehlversuche sperren die Anmeldung eine Weile.",
+        "es": "La contraseña de la interfaz web de la Bbox. Varios errores bloquean el acceso durante un tiempo."
+      },
+      "required": true
+    },
+    {
+      "key": "refresh_interval",
+      "type": "number",
+      "label": {
+        "en": "Refresh interval (s)",
+        "fr": "Intervalle de relevé (s)",
+        "de": "Abfrageintervall (s)",
+        "es": "Intervalo de lectura (s)"
+      },
+      "description": {
+        "en": "How often the Bbox is read, in seconds: one minute minimum.",
+        "fr": "Fréquence de lecture de la Bbox, en secondes : une minute minimum.",
+        "de": "Wie oft die Bbox abgefragt wird, in Sekunden: mindestens eine Minute.",
+        "es": "Frecuencia de lectura de la Bbox, en segundos: un minuto como mínimo."
+      },
+      "required": false,
+      "default": 60,
+      "min": 60,
+      "max": 3600
+    },
+    {
+      "key": "language",
+      "type": "select",
+      "label": {
+        "en": "Language of the feature names",
+        "fr": "Langue des noms de fonctionnalités",
+        "de": "Sprache der Funktionsnamen",
+        "es": "Idioma de los nombres de funciones"
+      },
+      "description": {
+        "en": "Gladys keeps a feature name once the device is added: choose before adding it.",
+        "fr": "Gladys garde le nom d'une fonctionnalité une fois l'appareil ajouté : choisissez avant de l'ajouter.",
+        "de": "Gladys behält den Namen einer Funktion, sobald das Gerät hinzugefügt ist: wähle vorher.",
+        "es": "Gladys conserva el nombre de una función una vez añadido el dispositivo: elija antes de añadirlo."
+      },
+      "required": false,
+      "default": "fr",
+      "options": [
         {
-          "url": "https://open-meteo.com/en/docs",
-          "label": { "en": "Open-Meteo documentation", "fr": "Documentation Open-Meteo" }
+          "value": "fr",
+          "label": { "en": "French", "fr": "Français", "de": "Französisch", "es": "Francés" }
+        },
+        {
+          "value": "en",
+          "label": { "en": "English", "fr": "Anglais", "de": "Englisch", "es": "Inglés" }
+        },
+        {
+          "value": "de",
+          "label": { "en": "German", "fr": "Allemand", "de": "Deutsch", "es": "Alemán" }
+        },
+        {
+          "value": "es",
+          "label": { "en": "Spanish", "fr": "Espagnol", "de": "Spanisch", "es": "Español" }
         }
       ]
     },
     {
-      "key": "latitude",
-      "type": "number",
-      "label": { "en": "Latitude", "fr": "Latitude" },
-      "description": {
-        "en": "Latitude used for the demo weather sensor.",
-        "fr": "Latitude utilisée par le capteur météo de démonstration."
+      "key": "track_hosts",
+      "type": "boolean",
+      "label": {
+        "en": "Offer the connected devices (presence)",
+        "fr": "Proposer les appareils connectés (présence)",
+        "de": "Verbundene Geräte anbieten (Anwesenheit)",
+        "es": "Ofrecer los dispositivos conectados (presencia)"
       },
-      "placeholder": { "en": "e.g. 48.8566", "fr": "ex. 48.8566" },
-      "required": true,
-      "default": 48.8566,
-      "min": -90,
-      "max": 90
+      "description": {
+        "en": "Every device the Bbox knows appears in the Discovery tab: add the phones whose presence you want to follow.",
+        "fr": "Chaque appareil connu de la Bbox apparaît dans l'onglet Découverte : ajoutez les téléphones dont vous voulez suivre la présence.",
+        "de": "Jedes Gerät, das die Bbox kennt, erscheint im Tab Erkennung: füge die Handys hinzu, deren Anwesenheit du verfolgen willst.",
+        "es": "Cada dispositivo que conoce la Bbox aparece en la pestaña Descubrimiento: añada los teléfonos cuya presencia quiera seguir."
+      },
+      "required": false,
+      "default": true
     },
     {
-      "key": "longitude",
-      "type": "number",
-      "label": { "en": "Longitude", "fr": "Longitude" },
-      "description": {
-        "en": "Longitude used for the demo weather sensor.",
-        "fr": "Longitude utilisée par le capteur météo de démonstration."
-      },
-      "placeholder": { "en": "e.g. 2.3522", "fr": "ex. 2.3522" },
-      "required": true,
-      "default": 2.3522,
-      "min": -180,
-      "max": 180
-    },
-    {
-      "key": "unit",
+      "key": "tls_verify",
       "type": "select",
-      "label": { "en": "Temperature unit", "fr": "Unité de température" },
-      "required": false,
-      "default": "celsius",
-      "options": [
-        { "value": "celsius", "label": { "en": "Celsius", "fr": "Celsius" } },
-        { "value": "fahrenheit", "label": { "en": "Fahrenheit", "fr": "Fahrenheit" } }
-      ]
-    },
-    {
-      "key": "poll_frequency",
-      "type": "number",
-      "label": { "en": "Refresh interval (s)", "fr": "Intervalle de rafraîchissement (s)" },
+      "label": {
+        "en": "Certificate check",
+        "fr": "Vérification du certificat",
+        "de": "Zertifikatsprüfung",
+        "es": "Comprobación del certificado"
+      },
       "description": {
-        "en": "How often sensors are polled, in seconds (one minute minimum).",
-        "fr": "Fréquence d'interrogation des capteurs, en secondes (une minute minimum)."
+        "en": "Keep it on. Turn it off only if the connection status reports a certificate error (see the documentation).",
+        "fr": "Laissez-la active. Ne la désactivez que si l'état de connexion signale une erreur de certificat (voir la documentation).",
+        "de": "Lass sie aktiv. Schalte sie nur aus, wenn der Verbindungsstatus einen Zertifikatsfehler meldet (siehe Dokumentation).",
+        "es": "Manténgala activa. Desactívela solo si el estado de conexión indica un error de certificado (vea la documentación)."
       },
       "required": false,
-      "default": 300,
-      "min": 60,
-      "max": 3600
+      "default": "verify",
+      "options": [
+        {
+          "value": "verify",
+          "label": {
+            "en": "Verify (recommended)",
+            "fr": "Vérifier (recommandé)",
+            "de": "Prüfen (empfohlen)",
+            "es": "Comprobar (recomendado)"
+          }
+        },
+        {
+          "value": "insecure",
+          "label": {
+            "en": "Do not verify",
+            "fr": "Ne pas vérifier",
+            "de": "Nicht prüfen",
+            "es": "No comprobar"
+          }
+        }
+      ]
     }
   ],
   "actions": [
     {
-      "key": "test_weather",
-      "label": { "en": "Test the weather provider", "fr": "Tester le fournisseur météo" },
-      "timeout_seconds": 30
+      "key": "test_connection",
+      "label": {
+        "en": "Test the connection",
+        "fr": "Tester la connexion",
+        "de": "Verbindung testen",
+        "es": "Probar la conexión"
+      },
+      "description": {
+        "en": "Reads the Bbox now and shows its model, firmware and Internet state.",
+        "fr": "Lit la Bbox maintenant et affiche son modèle, son micrologiciel et l'état d'Internet.",
+        "de": "Liest die Bbox jetzt und zeigt Modell, Firmware und Internetstatus.",
+        "es": "Lee la Bbox ahora y muestra su modelo, su firmware y el estado de Internet."
+      },
+      "timeout_seconds": 60
     },
     {
-      "key": "identify",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
+      "key": "reboot",
+      "label": {
+        "en": "Restart the Bbox",
+        "fr": "Redémarrer la Bbox",
+        "de": "Bbox neu starten",
+        "es": "Reiniciar la Bbox"
+      },
+      "description": {
+        "en": "Internet, Wi-Fi and telephone are cut for about two minutes.",
+        "fr": "Internet, le Wi-Fi et le téléphone sont coupés pendant environ deux minutes.",
+        "de": "Internet, WLAN und Telefon sind etwa zwei Minuten lang unterbrochen.",
+        "es": "Internet, el Wi-Fi y el teléfono se cortan durante unos dos minutos."
+      },
+      "timeout_seconds": 30,
       "fields": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
+          "key": "confirm",
+          "type": "boolean",
+          "label": {
+            "en": "I confirm the restart",
+            "fr": "Je confirme le redémarrage",
+            "de": "Ich bestätige den Neustart",
+            "es": "Confirmo el reinicio"
+          }
         }
       ]
     }
   ],
   "scene_triggers": [
     {
-      "key": "motion_detected",
-      "label": { "en": "Motion detected", "fr": "Mouvement détecté" },
-      "description": {
-        "en": "A demo motion sensor saw a person or an animal move.",
-        "fr": "Un détecteur de démonstration a vu bouger une personne ou un animal."
+      "key": "connection_lost",
+      "label": {
+        "en": "Internet connection lost",
+        "fr": "Connexion Internet perdue",
+        "de": "Internetverbindung verloren",
+        "es": "Conexión a Internet perdida"
       },
-      "fields": [
-        {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Sensor", "fr": "Détecteur" }
-        },
-        {
-          "key": "target",
-          "type": "multi_select",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" },
-          "options": [
-            { "value": "person", "label": { "en": "Person", "fr": "Personne" } },
-            { "value": "animal", "label": { "en": "Animal", "fr": "Animal" } }
-          ]
-        }
-      ],
+      "description": {
+        "en": "The Bbox lost its Internet connection.",
+        "fr": "La Bbox a perdu sa connexion Internet.",
+        "de": "Die Bbox hat ihre Internetverbindung verloren.",
+        "es": "La Bbox ha perdido su conexión a Internet."
+      }
+    },
+    {
+      "key": "connection_restored",
+      "label": {
+        "en": "Internet connection restored",
+        "fr": "Connexion Internet rétablie",
+        "de": "Internetverbindung wiederhergestellt",
+        "es": "Conexión a Internet restablecida"
+      },
+      "description": {
+        "en": "The Bbox is connected to the Internet again.",
+        "fr": "La Bbox est de nouveau connectée à Internet.",
+        "de": "Die Bbox ist wieder mit dem Internet verbunden.",
+        "es": "La Bbox vuelve a estar conectada a Internet."
+      },
       "variables": [
         {
-          "key": "target",
+          "key": "downtime_minutes",
+          "type": "number",
+          "label": {
+            "en": "Outage duration (minutes)",
+            "fr": "Durée de la coupure (minutes)",
+            "de": "Dauer des Ausfalls (Minuten)",
+            "es": "Duración del corte (minutos)"
+          }
+        },
+        {
+          "key": "ipv4",
           "type": "string",
-          "label": { "en": "What moved", "fr": "Ce qui a bougé" }
+          "label": {
+            "en": "Public IPv4 address",
+            "fr": "Adresse IPv4 publique",
+            "de": "Öffentliche IPv4-Adresse",
+            "es": "Dirección IPv4 pública"
+          }
         }
       ]
-    }
-  ],
-  "scene_actions": [
+    },
     {
-      "key": "identify_device",
-      "label": { "en": "Identify a device", "fr": "Identifier un appareil" },
-      "description": {
-        "en": "Make a device signal itself (the demo light blinks).",
-        "fr": "Fait se signaler un appareil (la lampe de démonstration clignote)."
+      "key": "missed_call",
+      "label": {
+        "en": "Missed call",
+        "fr": "Appel manqué",
+        "de": "Verpasster Anruf",
+        "es": "Llamada perdida"
       },
-      "timeout_seconds": 15,
-      "fields": [
+      "description": {
+        "en": "A call to the Bbox landline went unanswered.",
+        "fr": "Un appel vers la ligne fixe de la Bbox est resté sans réponse.",
+        "de": "Ein Anruf auf dem Festnetz der Bbox wurde nicht angenommen.",
+        "es": "Una llamada a la línea fija de la Bbox no fue contestada."
+      },
+      "variables": [
         {
-          "key": "device",
-          "type": "select",
-          "source": "devices",
-          "label": { "en": "Device", "fr": "Appareil" },
-          "required": true
-        }
-      ],
-      "outputs": [
+          "key": "number",
+          "type": "string",
+          "label": {
+            "en": "Caller number",
+            "fr": "Numéro de l'appelant",
+            "de": "Nummer des Anrufers",
+            "es": "Número de quien llama"
+          }
+        },
         {
-          "key": "signalled",
-          "type": "boolean",
-          "label": { "en": "Device signalled", "fr": "Appareil signalé" }
+          "key": "count",
+          "type": "number",
+          "label": {
+            "en": "Unanswered calls",
+            "fr": "Appels sans réponse",
+            "de": "Unbeantwortete Anrufe",
+            "es": "Llamadas sin respuesta"
+          }
         }
       ]
     }
   ],
   "widgets": [
     {
-      "key": "demo_status",
-      "label": { "en": "Demo status", "fr": "État de la démo" },
-      "description": {
-        "en": "Live temperature and plug power, plug connection and observed location.",
-        "fr": "Température et puissance en direct, connexion de la prise, position observée."
+      "key": "bbox",
+      "label": {
+        "en": "Bbox",
+        "fr": "Bbox",
+        "de": "Bbox",
+        "es": "Bbox"
       },
-      "icon": "activity",
-      "action_timeout_seconds": 15
+      "description": {
+        "en": "Throughput, Internet and line state, Wi-Fi and missed calls of the Bbox.",
+        "fr": "Débits, état d'Internet et de la ligne, Wi-Fi et appels manqués de la Bbox.",
+        "de": "Datenraten, Internet- und Leitungsstatus, WLAN und verpasste Anrufe der Bbox.",
+        "es": "Velocidades, estado de Internet y de la línea, Wi-Fi y llamadas perdidas de la Bbox."
+      },
+      "icon": "wifi",
+      "action_timeout_seconds": 30
     }
   ]
 }
