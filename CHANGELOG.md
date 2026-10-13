@@ -10,6 +10,18 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- Documentation in German and Spanish (`docs/de.md`, `docs/es.md`), published
+  by the store from Gladys 5.2.
+
+### Changed
+
+- Calmer logs: a normal reading writes nothing at info level any more. Info
+  keeps the connection to the Bbox, the loss and return of Internet and the
+  user actions; a failure that repeats writes one line when it starts and one
+  when it ends; the rest is at debug level (`LOG_LEVEL=debug`).
+
 ## [1.0.1] - 2026-10-13
 
 ### Added
