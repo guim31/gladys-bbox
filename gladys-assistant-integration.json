@@ -8,8 +8,8 @@
     "de": "Status der Bbox von Bouygues Telecom: Leitung, Internet, WLAN, Geräte, verpasste Anrufe.",
     "es": "Estado de la Bbox de Bouygues Telecom: línea, Internet, Wi-Fi, dispositivos y llamadas."
   },
-  "version": "1.0.1",
-  "docker_image": "ghcr.io/guim31/gladys-bbox:1.0.1",
+  "version": "1.0.2",
+  "docker_image": "ghcr.io/guim31/gladys-bbox:1.0.2",
   "gladys_version": ">=5.1.0",
   "cover_image": "https://raw.githubusercontent.com/guim31/gladys-bbox/main/cover.png",
   "categories": ["network"],
