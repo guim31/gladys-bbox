@@ -288,3 +288,44 @@ test('an older xDSL Bbox: no guest Wi-Fi nor telephony features', async () => {
     'VDSL2',
   );
 });
+
+test('the "lines" setting keeps only the ticked rows', async () => {
+  const { gladys } = await connect(await setup());
+  const ack = await gladys.fake.widgetGet(BBOX_WIDGET, {
+    language: 'fr',
+    settings: { lines: ['download', 'internet', 'uptime', 'unknown'] },
+  });
+  const { components } = ack.data.content;
+  assert.deepEqual(validateWidgetContent(ack.data.content), []);
+  assert.deepEqual(
+    components.map((component) => component.type),
+    ['value', 'status'],
+  );
+  assert.equal(components[0].label, TEXTS.widget.download.fr);
+  assert.deepEqual(
+    components[1].items.map((item) => item.label),
+    [TEXTS.widget.internet.fr, TEXTS.widget.uptime.fr],
+  );
+  assert.ok(components[1].items.every((item) => !('key' in item)));
+});
+
+test('an empty or missing "lines" setting shows everything', async () => {
+  const { gladys } = await connect(await setup());
+  const all = await gladys.fake.widgetGet(BBOX_WIDGET, { language: 'en' });
+  const empty = await gladys.fake.widgetGet(BBOX_WIDGET, {
+    language: 'en',
+    settings: { lines: [] },
+  });
+  assert.deepEqual(empty.data.content, all.data.content);
+  assert.ok(all.data.content.components.some((component) => component.type === 'button'));
+});
+
+test('rows this Bbox lacks never leave the widget empty', async () => {
+  const { gladys } = await connect(await setup({ fixture: 'vdsl' }));
+  const all = await gladys.fake.widgetGet(BBOX_WIDGET, { language: 'en' });
+  const ack = await gladys.fake.widgetGet(BBOX_WIDGET, {
+    language: 'en',
+    settings: { lines: ['guest_button', 'missed_calls'] },
+  });
+  assert.deepEqual(ack.data.content, all.data.content);
+});

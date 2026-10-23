@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { ACTION } from '../src/app.js';
 import { TRIGGER } from '../src/triggers.js';
-import { BBOX_WIDGET } from '../src/widget.js';
+import { BBOX_WIDGET, WIDGET_LINES } from '../src/widget.js';
 import { DEFAULT_CONFIG } from '../src/config.js';
 
 const manifest = JSON.parse(
@@ -188,4 +188,13 @@ test('the refresh interval never goes below one minute', () => {
   // The browser only accepts min + k for a number field without step: an
   // integer minimum and default.
   assert.ok(Number.isInteger(field.min) && Number.isInteger(field.default));
+});
+
+test('the widget "lines" setting offers exactly the rows the widget knows', () => {
+  const setting = manifest.widgets[0].settings.find((field) => field.key === 'lines');
+  assert.equal(setting.type, 'multi_select');
+  assert.deepEqual(
+    setting.options.map((option) => option.value),
+    WIDGET_LINES,
+  );
 });

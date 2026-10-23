@@ -338,6 +338,135 @@
         "es": "Velocidades, estado de Internet y de la línea, Wi-Fi y llamadas perdidas de la Bbox."
       },
       "icon": "wifi",
+      "settings": [
+        {
+          "key": "lines",
+          "type": "multi_select",
+          "label": {
+            "en": "Rows to show",
+            "fr": "Lignes à afficher",
+            "de": "Angezeigte Zeilen",
+            "es": "Filas que mostrar"
+          },
+          "description": {
+            "en": "Leave empty to show everything.",
+            "fr": "Laissez vide pour tout afficher.",
+            "de": "Leer lassen, um alles anzuzeigen.",
+            "es": "Déjelo vacío para mostrarlo todo."
+          },
+          "required": false,
+          "options": [
+            {
+              "value": "download",
+              "label": {
+                "en": "Download rate",
+                "fr": "Débit descendant",
+                "de": "Download-Rate",
+                "es": "Velocidad de bajada"
+              }
+            },
+            {
+              "value": "upload",
+              "label": {
+                "en": "Upload rate",
+                "fr": "Débit montant",
+                "de": "Upload-Rate",
+                "es": "Velocidad de subida"
+              }
+            },
+            {
+              "value": "devices",
+              "label": {
+                "en": "Connected devices",
+                "fr": "Appareils connectés",
+                "de": "Verbundene Geräte",
+                "es": "Dispositivos conectados"
+              }
+            },
+            {
+              "value": "internet",
+              "label": {
+                "en": "Internet",
+                "fr": "Internet",
+                "de": "Internet",
+                "es": "Internet"
+              }
+            },
+            {
+              "value": "line",
+              "label": {
+                "en": "Line",
+                "fr": "Ligne",
+                "de": "Leitung",
+                "es": "Línea"
+              }
+            },
+            {
+              "value": "ipv4",
+              "label": {
+                "en": "Public IPv4",
+                "fr": "IPv4 publique",
+                "de": "Öffentliche IPv4",
+                "es": "IPv4 pública"
+              }
+            },
+            {
+              "value": "wifi_24",
+              "label": {
+                "en": "Wi-Fi 2.4 GHz",
+                "fr": "Wi-Fi 2,4 GHz",
+                "de": "WLAN 2,4 GHz",
+                "es": "Wi-Fi 2,4 GHz"
+              }
+            },
+            {
+              "value": "wifi_5",
+              "label": {
+                "en": "Wi-Fi 5 GHz",
+                "fr": "Wi-Fi 5 GHz",
+                "de": "WLAN 5 GHz",
+                "es": "Wi-Fi 5 GHz"
+              }
+            },
+            {
+              "value": "wifi_guest",
+              "label": {
+                "en": "Guest Wi-Fi",
+                "fr": "Wi-Fi invité",
+                "de": "Gäste-WLAN",
+                "es": "Wi-Fi invitados"
+              }
+            },
+            {
+              "value": "missed_calls",
+              "label": {
+                "en": "Missed calls",
+                "fr": "Appels manqués",
+                "de": "Verpasste Anrufe",
+                "es": "Llamadas perdidas"
+              }
+            },
+            {
+              "value": "uptime",
+              "label": {
+                "en": "Uptime",
+                "fr": "En marche depuis",
+                "de": "Laufzeit",
+                "es": "Encendida desde"
+              }
+            },
+            {
+              "value": "guest_button",
+              "label": {
+                "en": "Guest Wi-Fi button",
+                "fr": "Bouton Wi-Fi invité",
+                "de": "Gäste-WLAN-Schaltfläche",
+                "es": "Botón Wi-Fi invitados"
+              }
+            }
+          ]
+        }
+      ],
       "action_timeout_seconds": 30
     }
   ]

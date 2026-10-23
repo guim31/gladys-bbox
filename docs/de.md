@@ -117,7 +117,9 @@ Wiederherstellung.
 
 Das Widget **Bbox** zeigt live die Datenraten und die Anzahl der verbundenen
 Geräte, den Internet- und Leitungsstatus, die IPv4-Adresse, das WLAN und die
-verpassten Anrufe. Seine Schaltfläche schaltet das Gäste-WLAN ein oder aus.
+verpassten Anrufe. Seine Schaltfläche schaltet das Gäste-WLAN ein oder aus. Die
+Einstellung **Angezeigte Zeilen** behält nur die Zeilen, die du ankreuzt; leer
+gelassen, zeigt das Widget alles.
 
 ## Zertifikat
 

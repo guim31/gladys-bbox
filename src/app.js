@@ -221,12 +221,13 @@ export function createApp(gladys, options = {}) {
     }
   }
 
-  function widgetContent(language) {
+  function widgetContent(language, settings) {
     return buildWidgetContent(gladys, {
       snapshot,
       capabilities: capabilityStore.get(),
       reachable,
       language,
+      settings,
     });
   }
 
@@ -386,7 +387,7 @@ export function createApp(gladys, options = {}) {
     gladys.onAction(ACTION.TEST_CONNECTION, () => testConnection());
     gladys.onAction(ACTION.REBOOT, (fields) => reboot(fields));
 
-    gladys.onWidgetGet(BBOX_WIDGET, ({ language }) => widgetContent(language));
+    gladys.onWidgetGet(BBOX_WIDGET, ({ language, settings }) => widgetContent(language, settings));
 
     gladys.onConfigUpdated(async (newConfig) => {
       setConfig(newConfig);
