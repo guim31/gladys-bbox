@@ -10,6 +10,11 @@ the notes of the version's GitHub Release.
 
 ## [Unreleased]
 
+### Added
+
+- Widget setting **Rows to show** (« Lignes à afficher ») : pick the tiles, status
+  rows and guest Wi-Fi button the widget shows; left empty, it shows everything.
+
 ## [1.0.2] - 2026-10-13
 
 ### Added

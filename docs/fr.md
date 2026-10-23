@@ -115,7 +115,9 @@ passe par Internet (Telegram…) ne peut pas partir. Préférez une action local
 
 Le widget **Bbox** affiche les débits et le nombre d'appareils connectés en
 direct, l'état d'Internet et de la ligne, l'adresse IPv4, le Wi-Fi et les
-appels manqués. Son bouton allume ou coupe le Wi-Fi invité.
+appels manqués. Son bouton allume ou coupe le Wi-Fi invité. Le réglage
+**Lignes à afficher** ne garde que les lignes cochées ; laissé vide, le widget
+affiche tout.
 
 ## Certificat
 

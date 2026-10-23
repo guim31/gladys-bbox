@@ -108,7 +108,8 @@ siren), or notify when the connection is restored.
 
 The **Bbox** widget shows the throughput and the number of connected devices
 live, the Internet and line state, the IPv4 address, the Wi-Fi and the missed
-calls. Its button turns the guest Wi-Fi on or off.
+calls. Its button turns the guest Wi-Fi on or off. Its **Rows to show** setting
+keeps only the rows you tick; left empty, the widget shows everything.
 
 ## Certificate
 

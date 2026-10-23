@@ -115,7 +115,8 @@ sirena), o notifique al restablecerse.
 El widget **Bbox** muestra en directo las velocidades y el número de
 dispositivos conectados, el estado de Internet y de la línea, la dirección
 IPv4, el Wi-Fi y las llamadas perdidas. Su botón enciende o apaga el Wi-Fi de
-invitados.
+invitados. El ajuste **Filas que mostrar** conserva solo las filas que marque;
+si lo deja vacío, el widget lo muestra todo.
 
 ## Certificado
 
