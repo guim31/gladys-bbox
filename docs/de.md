@@ -35,7 +35,7 @@ Bbox kennt (Handy, Computer …), erkannt an seiner MAC-Adresse.
 
 ## Voraussetzungen
 
-- Gladys 5.1 oder neuer.
+- Gladys 5.3 oder neuer.
 - Gladys im lokalen Netzwerk der Bbox.
 - Das **Administratorpasswort** der Bbox: das der Weboberfläche
   [mabbox.bytel.fr](https://mabbox.bytel.fr).

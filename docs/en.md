@@ -34,7 +34,7 @@ computer…), identified by its MAC address.
 
 ## Prerequisites
 
-- Gladys 5.1 or later.
+- Gladys 5.3 or later.
 - Gladys on the local network of the Bbox.
 - The **administrator password** of the Bbox: the one of the web interface
   [mabbox.bytel.fr](https://mabbox.bytel.fr).

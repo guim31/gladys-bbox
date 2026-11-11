@@ -35,7 +35,7 @@ Bbox (téléphone, ordinateur…), repéré par son adresse MAC.
 
 ## Prérequis
 
-- Gladys 5.1 ou plus récent.
+- Gladys 5.3 ou plus récent.
 - Gladys sur le réseau local de la Bbox.
 - Le **mot de passe administrateur** de la Bbox : celui de l'interface web
   [mabbox.bytel.fr](https://mabbox.bytel.fr).
