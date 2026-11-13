@@ -36,7 +36,7 @@ la Bbox (teléfono, ordenador…), identificado por su dirección MAC.
 
 ## Requisitos
 
-- Gladys 5.1 o más reciente.
+- Gladys 5.3 o más reciente.
 - Gladys en la red local de la Bbox.
 - La **contraseña de administrador** de la Bbox: la de la interfaz web
   [mabbox.bytel.fr](https://mabbox.bytel.fr).

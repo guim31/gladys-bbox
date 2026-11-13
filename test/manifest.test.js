@@ -198,3 +198,8 @@ test('the widget "lines" setting offers exactly the rows the widget knows', () =
     WIDGET_LINES,
   );
 });
+
+test('the catalog countries: France, which needs Gladys >= 5.3.0', () => {
+  assert.deepEqual(manifest.countries, ['FR']);
+  assert.ok(isAtLeast(minGladysVersion(), [5, 3, 0]), 'countries needs Gladys 5.3.0');
+});
